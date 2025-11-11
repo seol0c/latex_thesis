@@ -1,0 +1,2 @@
+\newcommand{\bd}[1]{\ifmmode{\let\txt\text \def\text##1{\txt{\addhangulfontfeatures{AutoFakeBold=3}\textbf{##1}}}\bm{#1}}%
+\else{\addhangulfontfeatures{AutoFakeBold=3}\textbf{\boldmath #1}}\fi}

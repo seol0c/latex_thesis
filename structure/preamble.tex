@@ -1,0 +1,88 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 패키지, 사용자 정의 매크로 호출 
+\input{../structure/package.sty}
+\input{../structure/format.sty}
+\input{../structure/page.sty}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 페이지 설정
+\newcommand{\geoTop}   {35mm} % 위쪽 여백
+\newcommand{\geoBottom}{40mm} % 아래 여백
+\newcommand{\geoLeft}  {33mm} % 좌측 여백
+\newcommand{\geoRight} {33mm} % 우측 여백
+\geometry{a4paper,top=\geoTop, bottom=\geoBottom, left=\geoLeft, right=\geoRight}
+
+\setmainhangulfont{Batang}[LetterSpace=10] % 한글 자간 늘림
+\setmainfont{Times New Roman}  % 영어는 기본 간격
+\linespread{1.7} % 줄간격
+\setlength{\parindent}{1.4em} % 들여쓰기
+
+\raggedbottom % 글 자동배치 하지 않고 단락, 줄간격 조절하지 않음
+
+% 페이지 하단의 꼬릿말 위치에 하이퍼링크(목차로 이동) 박스 추가
+\newcommand{\linkbox}{\AddToHook{shipout/background}{%
+\begin{tikzpicture}[remember picture, overlay]
+\node[anchor=south west, inner sep=0pt] at ([yshift=0mm]current page.south west) { % y축방향 이동
+\hyperlink{toc}{\phantom{\rule{\paperwidth}{3mm}}}}; % 이동박스 두께
+\end{tikzpicture}}}
+
+% 정해진 폭 안에서 글자 사이를 균등 분배(양쪽정렬)
+\ExplSyntaxOn
+\NewDocumentCommand{\JustifyName}{ O{6cm} m }{\makebox[#1][s]{%
+\seq_set_split:Nnn \l_tmpa_seq {} {#2}% 글자 분해
+\seq_use:Nn \l_tmpa_seq { \hfill }% 글자 사이에 \hfill 삽입
+}}\ExplSyntaxOff
+
+% 첫째, 둘째, 참고문헌 들여쓰기용 block
+\makeatletter
+\newenvironment{hangblock}[2][1]{%
+  \par
+  \hangafter=#1\relax
+  \hangindent=#2\relax
+  \everypar{\hangafter=#1\relax\hangindent=#2\relax}}{\par\everypar{}}
+\makeatother
+
+% 표 라벨 형식
+\DeclareCaptionLabelFormat{tablelabel}{<\,#1\ #2\,>\,\,}
+\renewcommand{\thetable}{\arabic{table}}
+\captionsetup[table]{name=표, labelformat=tablelabel, labelsep=space, textformat=simple}
+
+% 그림 라벨 형식
+\DeclareCaptionLabelFormat{figurelabel}{<\,#1\ #2\,>\,\,}
+\renewcommand{\thefigure}{\arabic{figure}}
+\captionsetup[figure]{name=그림, labelformat=figurelabel, labelsep=space, textformat=simple}
+
+% 폰트 크기와 위아래 여백
+\DeclareCaptionFont{mycaptionfont}{\fontsize{9pt}{9pt}\selectfont}
+\captionsetup[figure]{font=mycaptionfont}
+\captionsetup[table]{font=mycaptionfont}
+
+% 챕터별이 아닌 본문 전체로 표 번호 부여
+\counterwithout{table}{chapter}
+\counterwithout{figure}{chapter}
+
+% autoref 참조 이름 재정의
+\renewcommand*{\tableautorefname}{표}
+\renewcommand*{\figureautorefname}{그림}
+
+% autoref 출력 포맷 재정의 - korref로 지정
+\makeatletter\newcommand{\korref}[1]{<\,\autoref{#1}\,>}\makeatother
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 경고 무시
+\hbadness=10000 % underfull hbox 경고 무시(수평 방향 여백 경고 badness 10000까지 무시)
+\vbadness=10000 % overfull hbox 경고 무시(수직 방향 페이니 나눔 단락 경고 badness 10000까지 무시)
+\WarningFilter{latex}{Command \showhyphens}
+
+% bold 없는 폰트에서 bold 요청할 때 경고 제거
+\makeatletter
+\DeclareFontShape{TU}{Batang(0)}{b}{n}{<-> ssub * Batang(0)/m/n}{}
+\DeclareFontShape{TU}{Batang(1)}{b}{n}{<-> ssub * Batang(1)/m/n}{}
+\makeatother
+
+% 가나다라 카운터 ganada
+\newcounter{ganadacnt}
+\newcommand{\ganadareset}{\setcounter{ganadacnt}{0}}
+\newcommand{\ganada}{%
+  \ifnum\value{ganadacnt}>13
+    \setcounter{ganadacnt}{0}\fi
+  \ifcase\value{ganadacnt}
+    가.\ \or 나.\ \or 다.\ \or 라.\ \or 마.\ \or 바.\ \or 사.\ \or 아.\ \or 자.\ \or 차.\ \or 카.\ \or 타.\ \or 파.\ \or 하.\ %
+  \fi\stepcounter{ganadacnt}}

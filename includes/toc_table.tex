@@ -1,0 +1,34 @@
+\makeatletter
+
+% chapter 경계에서 생기는 자동 여백 제거
+\let\addvspace\@gobble
+
+% .lot 안 폰트명령 무시
+\def\LOT@killfonts{%
+  \let\fontsize\@gobbletwo
+  \let\selectfont\relax}
+
+% <표 n> 형태 번호 붙이기
+\renewcommand{\l@table}[2]{%
+  {\LOT@killfonts
+   \def\numberline##1{{\normalfont\normalsize <\,표 ##1\,>\,\,\,}}%
+   \@dottedtocline{1}{0em}{0em}{#1}{#2}}%
+}
+
+% listoftables 제목 자동 출력 제거
+\renewcommand{\listoftables}{\@starttoc{lot}}
+
+% 제목
+\renewcommand{\listtablename}{표 ~ ~ 목 ~ ~ 차}
+
+% 출력
+\chapter*{\listtablename}
+\addcontentsline{toc}{chapter}{표 목차} % 목차에는 표 목차로 추가함
+\vspace*{2em}
+
+\begingroup
+  \let\chapter\section
+  \listoftables
+\endgroup
+
+\makeatother

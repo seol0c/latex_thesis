@@ -1,0 +1,7 @@
+# main.tex 제외 모든 main.* 무시
+# 가끔 생기는 main(1).pdf등도 무시
+main.*
+main (1).*
+main (2).*
+main (3).*
+!main.tex

@@ -1,0 +1,45 @@
+% Batang은 Bold 없으므로 BoldFont를 Batang으로 매핑
+\setmainhangulfont{Batang}[BoldFont=Batang]
+
+% 강제 볼드
+\newcommand{\TitleFakeBold}{\addhangulfontfeatures{AutoFakeBold=3}}
+
+
+%% 여백 설정
+% Chapter
+\renewcommand{\thechapter}{\fontsize{18pt}{20pt}\selectfont\Roman{chapter}}
+\titleformat{\chapter}
+  {\normalfont\fontsize{16pt}{18pt}\bfseries\centering\TitleFakeBold} % 폰트 사이즈, 가운데정렬
+  {\thechapter.} % Ⅰ.
+  {0.4em} % Ⅰ. 다음 여백
+  {}
+\titlespacing{\chapter}{0pt}{-16pt}{0pt} % 좌, 위, 아래 여백
+
+% chapter*
+\titleformat{name=\chapter,numberless}
+  {\normalfont\fontsize{16pt}{18pt}\bfseries\centering\TitleFakeBold}
+  {}
+  {0pt}
+  {}
+
+% Section
+\renewcommand{\thesection}{\fontsize{14pt}{16pt}\selectfont\arabic{section}.}
+\titleformat{\section}
+  {\normalfont\fontsize{13pt}{15pt}\bfseries\TitleFakeBold}
+  {\thesection}
+  {0.4em}
+  {} 
+\titlespacing{\section}{0pt}{0pt}{0pt}
+
+% 페이지번호 중앙 및 대시 표현
+\makeatletter
+\def\ps@plain{%
+  \let\@oddhead\@empty
+  \let\@evenhead\@empty
+  \renewcommand{\@oddfoot}{\hfil - \thepage\ - \hfil}%
+  \renewcommand{\@evenfoot}{\hfil - \thepage\ - \hfil}}%
+\def\ps@headings{\ps@plain}
+\def\ps@myheadings{\ps@plain}
+\makeatother
+\setlength{\footskip}{\dimexpr\footskip+1.4em\relax}% 아래로 내림
+\pagestyle{plain} % 적용

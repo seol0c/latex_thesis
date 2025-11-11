@@ -1,0 +1,52 @@
+% 목차 스타일 조정
+\makeatletter
+
+% toc 안의 폰트 크기 등 기존 명령 무시
+\def\TOC@killfonts{%
+  \let\fontsize\@gobbletwo
+  \let\selectfont\relax}
+
+% Chapter
+\renewcommand{\l@chapter}[2]{%
+  \vskip 0.8em % 새 로마자 시작 전에 한 줄 띄우기
+  {\TOC@killfonts
+    \def\numberline##1{{\normalfont\normalsize ##1.\,\,}}%
+    \@dottedtocline{0}{0em}{1.4em}{#1}{#2}}}
+
+% Chapterstar는 위 여백 주지 않음
+\newcommand{\l@chapterstar}[2]{%
+  {\TOC@killfonts
+    \def\numberline##1{}%
+    \@dottedtocline{0}{0em}{0em}{#1}{#2}}}
+\providecommand*{\toclevel@chapterstar}{0}
+
+% Section
+\renewcommand{\l@section}[2]{{
+    \TOC@killfonts
+    \def\numberline##1{{\normalfont\normalsize ##1\,\,}}%
+    \@dottedtocline{1}{1.2em}{1.4em}{#1}{#2}}}
+
+% Subsection
+\renewcommand{\l@subsection}[2]{{%
+    \TOC@killfonts
+    \def\numberline##1{{\normalfont\normalsize ##1\,\,}}%
+    \@dottedtocline{2}{3.8em}{3.2em}{#1}{#2}}}
+
+% 점선 간격 조절
+\renewcommand{\@dotsep}{1}
+
+% 목차 깊이
+\setcounter{tocdepth}{1}
+
+% 목차 제목
+\renewcommand{\contentsname}{}
+\chapter*{\hypertarget{toc}{}목 ~ ~ ~ 차}
+\vspace{-2em}
+
+% 목차 출력 (chapter 번호 충돌 방지)
+\begingroup
+  \let\chapter\section
+  \tableofcontents
+\endgroup
+%
+\makeatother

@@ -1,0 +1,34 @@
+\makeatletter
+
+% chapter 경계에서 생기는 자동 여백 제거
+\let\addvspace\@gobble
+
+% .lof 안 폰트명령 무시
+\def\LOF@killfonts{%
+  \let\fontsize\@gobbletwo
+  \let\selectfont\relax}
+
+% <그림 n> 형태 번호 붙이기
+\renewcommand{\l@figure}[2]{%
+  {\LOF@killfonts
+   \def\numberline##1{{\normalfont\normalsize <\,그림 ##1\,>\,\,\,}}%
+   \@dottedtocline{1}{0em}{0em}{#1}{#2}}%
+}
+
+% listoffigures 제목 자동 출력 제거
+\renewcommand{\listoffigures}{\@starttoc{lof}}
+
+% 제목
+\renewcommand{\listfigurename}{그 ~ 림 ~ 목 ~ 차}
+
+% 출력
+\chapter*{\listfigurename}
+\addcontentsline{toc}{chapterstar}{그림 목차} % 목차에는 그림 목차로 추가함
+\vspace*{2em}
+
+\begingroup
+  \let\chapter\section
+  \listoffigures
+\endgroup
+
+\makeatother
