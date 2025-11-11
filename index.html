@@ -13,7 +13,7 @@
 
   main {
     display:grid;
-    grid-template-columns:240px 1fr minmax(360px,42vw);
+    grid-template-columns:200px 1fr minmax(360px,42vw);
     height:100vh;
   }
 
@@ -23,7 +23,7 @@
   article{ overflow:auto; background:#0b0d12; border-right:none; }
 
   .tree { list-style:none; margin:0; padding:6px; }
-  .tree li { margin:1px 0; padding:1px 0; }
+  .tree li { list-style:none; margin:1px 0; padding:1px 0; }
   .node {
     display:flex; align-items:center; gap:6px;
     padding:3px 5px; border-radius:5px;
@@ -35,6 +35,7 @@
   .file>.name { color:#e8ecf6; }
 
   .indent {
+    list-style:none; 
     margin-left:12px;
     border-left:1px dashed #263040;
     padding-left:8px;
@@ -153,7 +154,7 @@ function renderTree(node, base=""){
     row.className = "node " + (isDir ? "dir" : "file");
 
     const caret = document.createElement("span");
-    caret.textContent = isDir ? "▸" : "•";
+    caret.textContent = isDir ? "▸" : "";
     caret.style.minWidth = "14px";
 
     const label = document.createElement("span");
@@ -200,10 +201,10 @@ async function bootstrap(){
 
   const full = await fetchTree();
 
-  // ✅ chapters/ 아래만 노출
+  // chapters/ 아래만 노출
   const filtered = full.filter(x => x.path.startsWith("chapters/"));
 
-  // ✅ chapters/ 제거
+  // chapters/ 제거
   const stripped = filtered.map(x => ({
     path: x.path.replace(/^chapters\//, ""),
     type: x.type
@@ -217,7 +218,7 @@ async function bootstrap(){
 
 bootstrap();
 
-// ✅ 오른쪽 PDF 자동 표시
+// 오른쪽 PDF 자동 표시
 pdfFrame.src = `/${repo}/pdfjs/web/viewer.html?file=/${repo}/${pdfPath}`;
 </script>
 
