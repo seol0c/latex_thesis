@@ -1,4 +1,4 @@
-name: publish-pages
+name: publish-pdf
 
 on:
   push:
@@ -11,33 +11,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      # LaTeX 컴파일
+      # ✅ 핵심: main/ 디렉터리에 갇히지 않도록 강제 루트에서 컴파일
       - uses: xu-cheng/latex-action@v2
         with:
           root_file: main/main.tex
-          working_directory: .
+          work_in_root_file_dir: false
           latexmk_use_lualatex: true
           args: >
             -file-line-error
             -halt-on-error
             -interaction=nonstopmode
 
-      # pandoc 설치
-      - name: Install pandoc
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y pandoc
-
-      # TEX → HTML 변환 + PDF 복사
-      - name: Convert tex to html
+      # ✅ GitHub Pages에 올릴 PDF만 담을 폴더 생성
+      - name: Prepare site directory
         run: |
           mkdir site
-          for f in $(find . -name "*.tex"); do
-            pandoc "$f" -s -o "site/${f//\//_}.html"
-          done
           cp main/main.pdf site/
 
-      # GitHub Pages용 아티팩트 업로드
+      # ✅ Pages에 배포할 artifact 업로드
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
