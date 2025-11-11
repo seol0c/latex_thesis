@@ -178,7 +178,8 @@
     const data = await res.json();
     if(data.type !== 'file') throw new Error('파일이 아님');
     if(data.encoding === 'base64'){
-      const decoded = atob(data.content.replace(/\n/g,''));
+      const b64 = data.content.replace(/\n/g,'');
+      const decoded = decodeURIComponent(escape(atob(b64)));
       return decoded;
     }
     return data.content || '';
