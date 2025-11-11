@@ -1,5 +1,5 @@
 {
-  "name": "LaTeX Dev - XuCheng",
+  "name": "LaTeX Dev - LuaLaTeX",
   "image": "ghcr.io/xu-cheng/texlive-full:latest",
   "customizations": {
     "vscode": {
@@ -9,7 +9,25 @@
       "settings": {
         "latex-workshop.view.pdf.viewer": "tab",
         "latex-workshop.latex.autoBuild.run": "onSave",
-        "latex-workshop.latex.outDir": "./out"
+        "latex-workshop.latex.outDir": "./out",
+        "latex-workshop.latex.tools": [
+          {
+            "name": "lualatex",
+            "command": "lualatex",
+            "args": [
+              "-synctex=1",
+              "-interaction=nonstopmode",
+              "%DOC%"
+            ]
+          }
+        ],
+        "latex-workshop.latex.recipes": [
+          {
+            "name": "LuaLaTeX",
+            "tools": ["lualatex"]
+          }
+        ],
+        "latex-workshop.latex.autoBuild.recipe": "LuaLaTeX"
       }
     }
   },
