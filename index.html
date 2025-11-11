@@ -3,44 +3,71 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Repo Viewer + PDF</title>
+<title>Chapters Viewer + PDF</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github.min.css">
 <style>
   :root { --bg:#0b0c0f; --pane:#111318; --muted:#a7b0c0; --text:#e9edf5; --accent:#3ea6ff; --border:#262a33; }
-  *{box-sizing:border-box} 
-  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 ui-sans-serif,system-ui,'Segoe UI','Noto Sans KR';}
 
-  main{display:grid;grid-template-columns:260px 1fr minmax(360px,42vw);height:100vh}
-  aside,section,article{border-right:1px solid var(--border)}
-  aside{overflow:auto;background:#0d1015}
-  section{overflow:auto;background:#0b0d12}
-  article{overflow:auto;background:#0b0d12;border-right:none}
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.45 ui-sans-serif,system-ui,'Segoe UI','Noto Sans KR'; }
 
-  .tree{list-style:none;margin:0;padding:8px}
-  .tree li{margin:1px 0;padding:2px 0}
-  .node{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;cursor:pointer;color:#d7deea}
-  .node:hover{background:#101520}
-  .dir>.name{color:#9ad1ff}
-  .file>.name{color:#e8ecf6}
-  .indent{margin-left:16px;border-left:1px dashed #263040;padding-left:10px}
-  
-  .toolbar{padding:6px 10px;border-bottom:1px solid var(--border);background:#0e1116;font-family:ui-monospace;color:#b7c2d8}
-  pre{margin:0;padding:14px 16px;overflow:auto}
-  code{font:12px/1.5 'SFMono-Regular',Consolas,monospace}
+  main {
+    display:grid;
+    grid-template-columns:240px 1fr minmax(360px,42vw);
+    height:100vh;
+  }
 
-  iframe{width:100%;height:100%;border:0}
+  aside,section,article { border-right:1px solid var(--border); }
+  aside  { overflow:auto; background:#0d1015; }
+  section{ overflow:auto; background:#0b0d12; }
+  article{ overflow:auto; background:#0b0d12; border-right:none; }
+
+  .tree { list-style:none; margin:0; padding:6px; }
+  .tree li { margin:1px 0; padding:1px 0; }
+  .node {
+    display:flex; align-items:center; gap:6px;
+    padding:3px 5px; border-radius:5px;
+    cursor:pointer; color:#d7deea; font-size:13px;
+  }
+  .node:hover { background:#101520; }
+
+  .dir>.name { color:#9ad1ff; }
+  .file>.name { color:#e8ecf6; }
+
+  .indent {
+    margin-left:12px;
+    border-left:1px dashed #263040;
+    padding-left:8px;
+  }
+
+  .toolbar {
+    padding:6px 10px;
+    border-bottom:1px solid var(--border);
+    background:#0e1116;
+    font-family:ui-monospace,Consolas,monospace;
+    color:#b7c2d8;
+    font-size:13px;
+  }
+
+  pre { margin:0; padding:12px 14px; overflow:auto; }
+  code { font:12px/1.5 'SFMono-Regular',Consolas,monospace; }
+
+  iframe { width:100%; height:100%; border:0; }
 </style>
 </head>
 <body>
 
 <main>
+  <!-- LEFT: Tree -->
   <aside><ul id="tree" class="tree"></ul></aside>
 
+  <!-- MIDDLE: Code -->
   <section>
     <div class="toolbar" id="codePath">코드 파일 선택</div>
-    <pre><code id="codeblock" class="hljs">좌측 트리에서 파일을 선택하십시오.</code></pre>
+    <pre><code id="codeblock" class="hljs">좌측에서 파일을 선택하세요.</code></pre>
   </section>
 
+  <!-- RIGHT: PDF -->
   <article>
     <iframe id="pdfFrame"></iframe>
   </article>
@@ -50,130 +77,149 @@
 <script src="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/languages/latex.min.js"></script>
 
 <script>
-  const repo = "latex_thesis";
-  const owner = "seol0c";
-  const branch = "main";
-  const mainPdf = "main/main.pdf";
+const owner = "seol0c";
+const repo  = "latex_thesis";
+const branch = "main";
+const pdfPath = "main/main.pdf";
 
-  const el = (s)=>document.querySelector(s);
-  const treeEl = el('#tree');
-  const codeBlock = el('#codeblock');
-  const codePath = el('#codePath');
-  const pdfFrame = el('#pdfFrame');
+const el = (s)=>document.querySelector(s);
+const treeEl = el("#tree");
+const codeBlock = el("#codeblock");
+const codePath = el("#codePath");
+const pdfFrame = el("#pdfFrame");
 
-  const extsMap = {
-    'tex':'latex','sty':'latex','cls':'latex','bib':'latex',
-    'md':'markdown','json':'json','yml':'yaml','yaml':'yaml',
-    'js':'javascript','ts':'typescript','py':'python','html':'xml','xml':'xml','css':'css','txt':'plaintext'
-  };
+const extsMap = {
+  'tex':'latex','sty':'latex','cls':'latex','bib':'latex',
+  'md':'markdown','json':'json','yml':'yaml','yaml':'yaml',
+  'js':'javascript','ts':'typescript','py':'python','html':'xml',
+  'xml':'xml','css':'css','txt':'plaintext'
+};
 
-  const langFromExt = (p)=>{
-    const m = p.toLowerCase().match(/\.([a-z0-9]+)$/);
-    return m ? (extsMap[m[1]]||'plaintext') : 'plaintext';
-  };
+function langFromExt(p){
+  const m = p.toLowerCase().match(/\.([a-z0-9]+)$/);
+  return m ? (extsMap[m[1]] || 'plaintext') : 'plaintext';
+}
 
-  const fetchTree = async()=>{
-    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`);
-    return (await r.json()).tree;
-  };
+async function fetchTree(){
+  const url = `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`;
+  const r = await fetch(url);
+  const j = await r.json();
+  return j.tree;
+}
 
-  const fetchFile = async(path)=>{
-    const r = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`);
-    const j = await r.json();
-    if(j.encoding==="base64"){
-      const bin = atob(j.content.replace(/\n/g,''));
-      const buf = new Uint8Array([...bin].map(c=>c.charCodeAt(0)));
-      return new TextDecoder("utf-8").decode(buf);
-    }
-    return j.content;
-  };
+async function fetchFile(path){
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+  const r = await fetch(url);
+  const j = await r.json();
+  const bin = atob(j.content.replace(/\n/g,""));
+  const buf = new Uint8Array([...bin].map(c=>c.charCodeAt(0)));
+  return new TextDecoder("utf-8").decode(buf);
+}
 
-  const rawUrl = (path)=>`https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`;
-
-  async function openCode(path){
-    codePath.textContent = path;
-    try{
-      const txt = await fetchFile(path);
-      const lang = langFromExt(path);
-      codeBlock.className = 'hljs '+lang;
-      codeBlock.textContent = txt;
-      hljs.highlightElement(codeBlock);
-    }catch{
-      codeBlock.textContent = '불러오기 실패';
-    }
-
-    if(path.toLowerCase().endsWith('.pdf')){
-      pdfFrame.src = `/${repo}/pdfjs/web/viewer.html?file=/${repo}/${path}`;
+function buildTree(items){
+  const root = {};
+  for(const it of items){
+    const segs = it.path.split("/");
+    let cur = root;
+    for(let i=0;i<segs.length;i++){
+      const s = segs[i];
+      if(!cur[s]) cur[s] = {};
+      if(i===segs.length-1) cur[s]._type = it.type;
+      cur = cur[s];
     }
   }
+  return root;
+}
 
-  const buildTreeStruct = (items)=>{
-    const root = {};
-    for(const it of items){
-      const segs = it.path.split('/');
-      let cur = root;
-      for(let i=0;i<segs.length;i++){
-        const s=segs[i];
-        cur[s] = cur[s] || {};
-        if(i===segs.length-1) cur[s]._type = it.type;
-        cur = cur[s];
-      }
-    }
-    return root;
-  };
+function renderTree(node, base=""){
+  const ul = document.createElement("ul");
+  ul.className = base ? "indent" : "";
 
-  const renderTree = (node, base='')=>{
-    const ul = document.createElement('ul');
-    ul.className = base? 'indent':'';
-    const names = Object.keys(node).filter(k=>!k.startsWith('_'))
-      .sort((a,b)=>{
-        const ad=(node[a]._type==='tree'?0:1);
-        const bd=(node[b]._type==='tree'?0:1);
-        return ad-bd||a.localeCompare(b);
+  const names = Object.keys(node)
+    .filter(k => !k.startsWith("_"))
+    .sort((a,b)=>{
+      const ad = (node[a]._type==="tree") ? 0 : 1;
+      const bd = (node[b]._type==="tree") ? 0 : 1;
+      return ad - bd || a.localeCompare(b);
+    });
+
+  for(const name of names){
+    const child = node[name];
+    const li = document.createElement("li");
+
+    const row = document.createElement("div");
+    const isDir = (child._type==="tree");
+
+    row.className = "node " + (isDir ? "dir" : "file");
+
+    const caret = document.createElement("span");
+    caret.textContent = isDir ? "▸" : "•";
+    caret.style.minWidth = "14px";
+
+    const label = document.createElement("span");
+    label.className = "name";
+    label.textContent = name;
+
+    row.appendChild(caret);
+    row.appendChild(label);
+    li.appendChild(row);
+
+    if(isDir){
+      const sub = renderTree(child, base + name + "/");
+      sub.style.display = "none";
+      row.addEventListener("click",()=>{
+        sub.style.display = sub.style.display==="none" ? "block" : "none";
+        caret.textContent = sub.style.display==="none" ? "▸" : "▾";
       });
-    for(const name of names){
-      const child=node[name];
-      const li=document.createElement('li');
-      const row=document.createElement('div');
-      const isDir=(child._type==='tree');
-      row.className='node '+(isDir?'dir':'file');
-      const caret=document.createElement('span');
-      caret.textContent=isDir?'▸':'•';
-      caret.style.minWidth='14px';
-      const label=document.createElement('span');
-      label.className='name';
-      label.textContent=name;
-
-      row.appendChild(caret);
-      row.appendChild(label);
-      li.appendChild(row);
-
-      if(isDir){
-        const sub=renderTree(child, base+name+'/');
-        sub.style.display='none';
-        row.addEventListener('click',()=>{
-          sub.style.display=sub.style.display==='none'?'block':'none';
-          caret.textContent=sub.style.display==='none'?'▸':'▾';
-        });
-        li.appendChild(sub);
-      }else{
-        row.addEventListener('click',()=>openCode(base+name));
-      }
-      ul.appendChild(li);
+      li.appendChild(sub);
+    } else {
+      row.addEventListener("click",()=>openCode(base + name));
     }
-    return ul;
-  };
 
-  async function bootstrap(){
-    treeEl.innerHTML = '<li class="muted" style="padding:8px">불러오는 중…</li>';
-    const items = await fetchTree();
-    const root = buildTreeStruct(items);
-    treeEl.innerHTML='';
-    treeEl.appendChild(renderTree(root,''));
+    ul.appendChild(li);
   }
 
-  bootstrap();
-  setTimeout(()=> pdfFrame.src=`/${repo}/pdfjs/web/viewer.html?file=/${repo}/${mainPdf}`, 300);
+  return ul;
+}
+
+async function openCode(path){
+  codePath.textContent = path;
+  try{
+    const txt = await fetchFile("chapters/" + path);
+    const lang = langFromExt(path);
+    codeBlock.className = "hljs " + lang;
+    codeBlock.textContent = txt;
+    hljs.highlightElement(codeBlock);
+  }catch(e){
+    codeBlock.textContent = "불러오기 실패";
+  }
+}
+
+async function bootstrap(){
+  treeEl.innerHTML = "<li style='padding:6px;color:#999'>불러오는 중…</li>";
+
+  const full = await fetchTree();
+
+  // ✅ chapters/ 아래만 노출
+  const filtered = full.filter(x => x.path.startsWith("chapters/"));
+
+  // ✅ chapters/ 제거
+  const stripped = filtered.map(x => ({
+    path: x.path.replace(/^chapters\//, ""),
+    type: x.type
+  }));
+
+  const root = buildTree(stripped);
+
+  treeEl.innerHTML = "";
+  treeEl.appendChild(renderTree(root,""));
+}
+
+bootstrap();
+
+// ✅ 오른쪽 PDF 자동 표시
+pdfFrame.src = `/${repo}/pdfjs/web/viewer.html?file=/${repo}/${pdfPath}`;
 </script>
+
 </body>
 </html>
