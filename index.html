@@ -173,27 +173,26 @@
   };
 
   /* ✅ 핵심: chapters 아래만 root로 승격 */
-  async function bootstrap(){
-    treeEl.innerHTML = '<li class="muted" style="padding:8px">불러오는 중…</li>';
+async function bootstrap(){
+  treeEl.innerHTML = '<li class="muted" style="padding:8px">불러오는 중…</li>';
 
-    const all = await fetchTree();
+  const all = await fetchTree();
 
-    /* ✅ 1) chapters 경로만 필터링 */
-    const raw = all.filter(x => x.path.startsWith("chapters/"));
+  // ✅ 1) chapters/ 아래만 남기기
+  const raw = all.filter(x => x.path.startsWith("chapters/"));
 
-    /* ✅ 2) chapters/ 제거하여 최상단으로 승격 */
-    const stripped = raw.map(x => ({
-      path: x.path.replace(/^chapters\//, ""),
-      type: x.type
-    }));
+  // ✅ 2) type(tree/blob) 유지한 채 path만 변환
+  const stripped = raw.map(x => ({
+    path: x.path.replace(/^chapters\//, ""),
+    type: x.type   // ← 절대 변형하면 안 됨
+  }));
 
-    /* ✅ 3) 트리 생성 */
-    const root = buildTreeStruct(stripped);
+  // ✅ 3) 트리 구조 생성
+  const root = buildTreeStruct(stripped);
 
-    /* ✅ 4) 트리 출력 */
-    treeEl.innerHTML='';
-    treeEl.appendChild(renderTree(root,''));
-  }
+  treeEl.innerHTML='';
+  treeEl.appendChild(renderTree(root,''));
+}
 
   bootstrap();
 
