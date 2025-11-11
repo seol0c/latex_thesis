@@ -2,16 +2,35 @@
 \input{../structure/preamble.tex}
 \begin{document}
 \linkbox % 바로가기 버튼
-\input{../includes/title.tex} % 표지
+
+% 국문
+\newcommand{\thesistitle}{과학영재 학생들의 길이 측정 및 자료 해석 과정에서 유효숫자 활용 실태 연구}
+\newcommand{\thesisauthor}{설영찬}
+\newcommand{\thesisyear}{2025}
+\newcommand{\thesismonth}{9}
+\newcommand{\thesisgrad}{전남대학교}
+\newcommand{\thesisdept}{과학교육학과}
+\newcommand{\thesisadvisor}{최재혁} % 지도교수
+\newcommand{\thesischair}{강영호} % 심사위원장
+\newcommand{\thesisexamone}{김민환} % 심사위원1
+\newcommand{\thesisexamtwo}{최재혁} % 심사위원2
+
+% 영어
+\newcommand{\ethesistitle}{An Analysis of Science-Gifted Students' Application of Significant Figures in Length Measurement and Data Interpretation}
+\newcommand{\ethesisauthor}{Seol, Young chan}
+\newcommand{\ethesisgrad}{Graduate School, Chonnam National University}
+\newcommand{\ethesisdept}{Department of Science Education}
+\newcommand{\ethesisadvisor}{Choi, Jaehyeok}
+
+%\input{../includes/title.tex} % 표지
 \input{../tablefigure/table.tex} % 표 모음 호출
 \input{../tablefigure/figure.tex} % 그림 모음 호출
 
-%\input{../includes/test.tex}\clearpage % 테스트 페이지 - 삭제
 \setcounter{page}{1}\pagenumbering{roman} % 로만체 페이지번호 i
 
-\input{../includes/toc.tex}\clearpage % 목차
-\input{../includes/toc_table.tex}\clearpage % 표목차
-\input{../includes/toc_fig.tex}\clearpage % 그림목차
+%\input{../includes/toc.tex}\clearpage % 목차
+%\input{../includes/toc_table.tex}\clearpage % 표목차
+%\input{../includes/toc_fig.tex}\clearpage % 그림목차
 
 \input{../includes/abstract_kor.tex}\clearpage % 국문초록
 
@@ -23,7 +42,7 @@
 \subimport{../chapters/05_결론/}{05.tex}\clearpage
 
 \subimport{../chapters/06_참고문헌/}{참고문헌.tex}\clearpage
-\input{../includes/abstract_eng.tex}\clearpage % 영문초록
-\subimport{../chapters/07_부록/}{부록.tex}
+%\input{../includes/abstract_eng.tex}\clearpage % 영문초록
+%\subimport{../chapters/07_부록/}{부록.tex}
 
 \end{document}
