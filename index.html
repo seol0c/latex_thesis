@@ -22,11 +22,11 @@
   section{ overflow:auto; background:#0b0d12; }
   article{ overflow:auto; background:#0b0d12; border-right:none; }
 
-  .tree { list-style:none; margin:0; padding:6px; }
-  .tree li { list-style:none; margin:1px 0; padding:1px 0; }
+  .tree { list-style:none; margin:0; padding:2px; }
+  .tree li { list-style:none; margin:1px 0; padding:0; }
   .node {
-    display:flex; align-items:center; gap:6px;
-    padding:3px 5px; border-radius:5px;
+    display:flex; align-items:center; gap:4px;
+    padding:2px 2px; border-radius:5px;
     cursor:pointer; color:#d7deea; font-size:13px;
   }
   .node:hover { background:#101520; }
@@ -36,9 +36,9 @@
 
   .indent {
     list-style:none; 
-    margin-left:12px;
+    margin-left:2px;
     border-left:1px dashed #263040;
-    padding-left:8px;
+    padding-left:1px;
   }
 
   .toolbar {
@@ -155,7 +155,7 @@ function renderTree(node, base=""){
 
     const caret = document.createElement("span");
     caret.textContent = isDir ? "▸" : "";
-    caret.style.minWidth = "14px";
+    caret.style.minWidth = "4px";
 
     const label = document.createElement("span");
     label.className = "name";
