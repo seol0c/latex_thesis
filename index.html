@@ -23,7 +23,7 @@
   section{ overflow:auto; background:#0b0d12; }
   article{ overflow:auto; background:#0b0d12; border-right:none; }
 
-  /* ✅ 트리 스타일 — VSCode 스타일 */
+  /* ✅ 왼쪽 최대 붙이기 + 들여쓰기 최소화 */
   .tree { list-style:none; margin:0; padding:4px; }
   .tree li { margin:0; padding:0; }
 
@@ -32,27 +32,20 @@
     gap:4px;
     padding:2px 4px;
     border-radius:4px;
-    cursor:pointer;
-    color:#d7deea;
+    cursor:pointer; 
+    color:#d7deea; 
     font-size:13px;
   }
   .node:hover { background:#101520; }
 
-  .dir .name { color:#9ad1ff; }
-  .file .name { color:#e8ecf6; }
+  .dir>.name { color:#9ad1ff; }
+  .file>.name { color:#e8ecf6; }
 
-  /* ✅ 들여쓰기 최소화 */
+  /* ✅ 들여쓰기 거의 제거 / border 제거 */
   .indent {
-    margin-left:14px;    /* VSCode 수준 들여쓰기 */
+    margin-left:6px;
     padding-left:4px;
     border-left:none;
-  }
-
-  /* ✅ caret 고정 폭(L/R 정렬되는 효과) */
-  .caret {
-    width:12px;
-    display:inline-block;
-    text-align:center;
   }
 
   .toolbar {
@@ -64,6 +57,7 @@
     font-size:13px;
   }
 
+  /* ✅ 코드 패딩 최소화 */
   pre { margin:0; padding:10px 12px; overflow:auto; }
   code { font:12px/1.5 'SFMono-Regular',Consolas,monospace; }
 
@@ -164,12 +158,12 @@ function renderTree(node, base=""){
 
     const row = document.createElement("div");
     const isDir = (child._type==="tree");
+
     row.className = "node " + (isDir ? "dir" : "file");
 
-    /* ✅ 파일 점 삭제 / 폴더만 caret 표시 */
     const caret = document.createElement("span");
-    caret.className = "caret";
-    caret.textContent = isDir ? "▸" : "";
+    caret.textContent = isDir ? "▸" : "•";
+    caret.style.minWidth = "12px";
 
     const label = document.createElement("span");
     label.className = "name";
@@ -182,12 +176,10 @@ function renderTree(node, base=""){
     if(isDir){
       const sub = renderTree(child, base + name + "/");
       sub.style.display = "none";
-
       row.addEventListener("click",()=>{
         sub.style.display = sub.style.display==="none" ? "block" : "none";
-        caret.textContent = (sub.style.display==="none") ? "▸" : "▾";
+        caret.textContent = sub.style.display==="none" ? "▸" : "▾";
       });
-
       li.appendChild(sub);
     } else {
       row.addEventListener("click",()=>openCode(base + name));
@@ -216,13 +208,16 @@ async function bootstrap(){
   treeEl.innerHTML = "<li style='padding:6px;color:#999'>불러오는 중…</li>";
 
   const full = await fetchTree();
+
   const filtered = full.filter(x => x.path.startsWith("chapters/"));
+
   const stripped = filtered.map(x => ({
     path: x.path.replace(/^chapters\//, ""),
     type: x.type
   }));
 
   const root = buildTree(stripped);
+
   treeEl.innerHTML = "";
   treeEl.appendChild(renderTree(root,""));
 }
