@@ -132,9 +132,9 @@ function buildTree(items){
   return root;
 }
 
-function renderTree(node, base=""){
+function renderTree(node, base="", depth=0){
   const ul = document.createElement("ul");
-  ul.className = base ? "indent" : "";
+  ul.className = depth >= 1 ? "indent" : "";
 
   const names = Object.keys(node)
     .filter(k => !k.startsWith("_"))
@@ -166,7 +166,7 @@ function renderTree(node, base=""){
     li.appendChild(row);
 
     if(isDir){
-      const sub = renderTree(child, base + name + "/");
+      const sub = renderTree(child, base + name + "/", depth+1);
       sub.style.display = "none";
       row.addEventListener("click",()=>{
         sub.style.display = sub.style.display==="none" ? "block" : "none";
