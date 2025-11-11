@@ -5,25 +5,31 @@
 <meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Repo Viewer + PDF</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@highlightjs/cdn-assets@11.9.0/styles/github.min.css">
+
 <style>
   :root { --bg:#0b0c0f; --pane:#111318; --muted:#a7b0c0; --text:#e9edf5; --accent:#3ea6ff; --border:#262a33; }
   *{box-sizing:border-box} 
   body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 ui-sans-serif,system-ui,'Segoe UI','Noto Sans KR';}
 
-  main{display:grid;grid-template-columns:260px 1fr minmax(360px,42vw);height:100vh}
+  /* ✅ 트리 폭 260px → 200px로 축소 */
+  main{display:grid;grid-template-columns:200px 1fr minmax(360px,42vw);height:100vh}
+
   aside,section,article{border-right:1px solid var(--border)}
   aside{overflow:auto;background:#0d1015}
   section{overflow:auto;background:#0b0d12}
   article{overflow:auto;background:#0b0d12;border-right:none}
 
-  .tree{list-style:none;margin:0;padding:8px}
-  .tree li{margin:1px 0;padding:2px 0}
-  .node{display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;cursor:pointer;color:#d7deea}
+  /* ✅ 들여쓰기 최소화 */
+  .tree{list-style:none;margin:0;padding:4px}
+  .tree li{margin:1px 0;padding:1px 0}
+  .node{display:flex;align-items:center;gap:6px;padding:3px 4px;border-radius:4px;cursor:pointer;color:#d7deea}
   .node:hover{background:#101520}
   .dir>.name{color:#9ad1ff}
   .file>.name{color:#e8ecf6}
-  .indent{margin-left:16px;border-left:1px dashed #263040;padding-left:10px}
-  
+
+  /* ✅ 들여쓰기 거의 제거 */
+  .indent{margin-left:6px;border-left:none;padding-left:4px}
+
   .toolbar{padding:6px 10px;border-bottom:1px solid var(--border);background:#0e1116;font-family:ui-monospace;color:#b7c2d8}
   pre{margin:0;padding:14px 16px;overflow:auto}
   code{font:12px/1.5 'SFMono-Regular',Consolas,monospace}
@@ -88,8 +94,6 @@
     return j.content;
   };
 
-  const rawUrl = (path)=>`https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${path}`;
-
   async function openCode(path){
     codePath.textContent = path;
     try{
@@ -107,13 +111,14 @@
     }
   }
 
+  /* ✅ 트리 구조 만들기 */
   const buildTreeStruct = (items)=>{
     const root = {};
     for(const it of items){
       const segs = it.path.split('/');
       let cur = root;
       for(let i=0;i<segs.length;i++){
-        const s=segs[i];
+        const s = segs[i];
         cur[s] = cur[s] || {};
         if(i===segs.length-1) cur[s]._type = it.type;
         cur = cur[s];
@@ -122,6 +127,7 @@
     return root;
   };
 
+  /* ✅ 트리 렌더링 (들여쓰기 최소화) */
   const renderTree = (node, base='')=>{
     const ul = document.createElement('ul');
     ul.className = base? 'indent':'';
@@ -137,9 +143,11 @@
       const row=document.createElement('div');
       const isDir=(child._type==='tree');
       row.className='node '+(isDir?'dir':'file');
+
       const caret=document.createElement('span');
       caret.textContent=isDir?'▸':'•';
-      caret.style.minWidth='14px';
+      caret.style.minWidth='12px';
+
       const label=document.createElement('span');
       label.className='name';
       label.textContent=name;
@@ -164,16 +172,32 @@
     return ul;
   };
 
+  /* ✅ 핵심: chapters 아래만 root로 승격 */
   async function bootstrap(){
     treeEl.innerHTML = '<li class="muted" style="padding:8px">불러오는 중…</li>';
-    const items = await fetchTree();
-    const root = buildTreeStruct(items);
+
+    const all = await fetchTree();
+
+    /* ✅ 1) chapters 경로만 필터링 */
+    const raw = all.filter(x => x.path.startsWith("chapters/"));
+
+    /* ✅ 2) chapters/ 제거하여 최상단으로 승격 */
+    const stripped = raw.map(x => ({
+      path: x.path.replace(/^chapters\//, ""),
+      type: x.type
+    }));
+
+    /* ✅ 3) 트리 생성 */
+    const root = buildTreeStruct(stripped);
+
+    /* ✅ 4) 트리 출력 */
     treeEl.innerHTML='';
     treeEl.appendChild(renderTree(root,''));
   }
 
   bootstrap();
-  setTimeout(()=> pdfFrame.src=`/${repo}/pdfjs/web/viewer.html?file=/${repo}/${mainPdf}`, 300);
+
+  setTimeout(()=> pdfFrame.src=`/${repo}/pdfjs/web/viewer.html?file=/${repo}/${mainPdf}`, 400);
 </script>
 </body>
 </html>
