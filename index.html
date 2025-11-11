@@ -8,66 +8,66 @@
 <style>
   :root { --bg:#0b0c0f; --pane:#111318; --muted:#a7b0c0; --text:#e9edf5; --accent:#3ea6ff; --border:#262a33; }
 
-  *{box-sizing:border-box}
-  body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 'Noto Sans KR',ui-sans-serif;}
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--text); font:14px/1.45 ui-sans-serif,system-ui,'Segoe UI','Noto Sans KR'; }
 
-  /* ✅ 트리 폭 200px */
-  main{
+  main {
     display:grid;
-    grid-template-columns:200px 1fr minmax(360px,42vw);
+    grid-template-columns:240px 1fr minmax(360px,42vw);
     height:100vh;
   }
 
-  aside,section,article{border-right:1px solid var(--border)}
-  aside{overflow:auto;background:#0d1015}
-  section{overflow:auto;background:#0b0d12}
-  article{overflow:auto;background:#0b0d12;border-right:none}
+  aside,section,article { border-right:1px solid var(--border); }
+  aside  { overflow:auto; background:#0d1015; }
+  section{ overflow:auto; background:#0b0d12; }
+  article{ overflow:auto; background:#0b0d12; border-right:none; }
 
-  /* ✅ VSCode 스타일 단순화 */
-  .tree{list-style:none;margin:0;padding:6px}
-  .tree li{margin:0;padding:0}
+  .tree { list-style:none; margin:0; padding:6px; }
+  .tree li { margin:1px 0; padding:1px 0; }
+  .node {
+    display:flex; align-items:center; gap:6px;
+    padding:3px 5px; border-radius:5px;
+    cursor:pointer; color:#d7deea; font-size:13px;
+  }
+  .node:hover { background:#101520; }
 
-  .node{
-    display:flex;align-items:center;
-    gap:4px;
-    padding:3px 4px;
-    border-radius:4px;
-    cursor:pointer;
+  .dir>.name { color:#9ad1ff; }
+  .file>.name { color:#e8ecf6; }
+
+  .indent {
+    margin-left:12px;
+    border-left:1px dashed #263040;
+    padding-left:8px;
+  }
+
+  .toolbar {
+    padding:6px 10px;
+    border-bottom:1px solid var(--border);
+    background:#0e1116;
+    font-family:ui-monospace,Consolas,monospace;
+    color:#b7c2d8;
     font-size:13px;
   }
-  .node:hover{background:#101520}
 
-  .dir .name{color:#9ad1ff}
-  .file .name{color:#e8ecf6}
+  pre { margin:0; padding:12px 14px; overflow:auto; }
+  code { font:12px/1.5 'SFMono-Regular',Consolas,monospace; }
 
-  /* ✅ 들여쓰기 최소화 */
-  .indent{margin-left:14px;padding-left:4px;border-left:none}
-
-  /* ✅ caret 크기 통일 */
-  .caret{width:12px;text-align:center;display:inline-block}
-
-  .toolbar{
-    padding:4px 8px;border-bottom:1px solid var(--border);
-    background:#0e1116;font-family:ui-monospace,Consolas;
-    color:#b7c2d8;font-size:13px;
-  }
-
-  pre{margin:0;padding:10px 12px;overflow:auto}
-  code{font:12px/1.5 'SFMono-Regular',Consolas,monospace}
-
-  iframe{width:100%;height:100%;border:0}
+  iframe { width:100%; height:100%; border:0; }
 </style>
 </head>
 <body>
 
 <main>
+  <!-- LEFT: Tree -->
   <aside><ul id="tree" class="tree"></ul></aside>
 
+  <!-- MIDDLE: Code -->
   <section>
     <div class="toolbar" id="codePath">코드 파일 선택</div>
     <pre><code id="codeblock" class="hljs">좌측에서 파일을 선택하세요.</code></pre>
   </section>
 
+  <!-- RIGHT: PDF -->
   <article>
     <iframe id="pdfFrame"></iframe>
   </article>
@@ -78,150 +78,147 @@
 
 <script>
 const owner = "seol0c";
-const repo = "latex_thesis";
+const repo  = "latex_thesis";
 const branch = "main";
 const pdfPath = "main/main.pdf";
 
-const treeEl = document.querySelector("#tree");
-const codeBlock = document.querySelector("#codeblock");
-const codePath  = document.querySelector("#codePath");
-const pdfFrame  = document.querySelector("#pdfFrame");
+const el = (s)=>document.querySelector(s);
+const treeEl = el("#tree");
+const codeBlock = el("#codeblock");
+const codePath = el("#codePath");
+const pdfFrame = el("#pdfFrame");
 
-const extsMap={
-  tex:"latex",sty:"latex",cls:"latex",bib:"latex",
-  md:"markdown",json:"json",yml:"yaml",yaml:"yaml",
-  js:"javascript",ts:"typescript",py:"python",html:"xml",
-  xml:"xml",css:"css",txt:"plaintext"
+const extsMap = {
+  'tex':'latex','sty':'latex','cls':'latex','bib':'latex',
+  'md':'markdown','json':'json','yml':'yaml','yaml':'yaml',
+  'js':'javascript','ts':'typescript','py':'python','html':'xml',
+  'xml':'xml','css':'css','txt':'plaintext'
 };
 
 function langFromExt(p){
-  const m=p.toLowerCase().match(/\.([a-z0-9]+)$/);
-  return m?(extsMap[m[1]]||"plaintext"):"plaintext";
+  const m = p.toLowerCase().match(/\.([a-z0-9]+)$/);
+  return m ? (extsMap[m[1]] || 'plaintext') : 'plaintext';
 }
 
-/* ✅ 안정적으로 작동하는 Git Trees API */
 async function fetchTree(){
-  const url=`https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`;
-  const r=await fetch(url);
-  return (await r.json()).tree;
+  const url = `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`;
+  const r = await fetch(url);
+  const j = await r.json();
+  return j.tree;
 }
 
-/* ✅ 파일 본문 로드 */
 async function fetchFile(path){
-  const url=`https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
-  const r=await fetch(url);
-  const j=await r.json();
-  const text=atob(j.content.replace(/\n/g,""));
-  const buf=new Uint8Array([...text].map(c=>c.charCodeAt(0)));
+  const url = `https://api.github.com/repos/${owner}/${repo}/contents/${path}?ref=${branch}`;
+  const r = await fetch(url);
+  const j = await r.json();
+  const bin = atob(j.content.replace(/\n/g,""));
+  const buf = new Uint8Array([...bin].map(c=>c.charCodeAt(0)));
   return new TextDecoder("utf-8").decode(buf);
 }
 
-/* ✅ 트리 구조 생성 */
 function buildTree(items){
-  const root={};
+  const root = {};
   for(const it of items){
-    const parts=it.path.split("/");
-    let cur=root;
-    for(let i=0;i<parts.length;i++){
-      const p=parts[i];
-      if(!cur[p]) cur[p]={};
-      if(i===parts.length-1) cur[p]._type=it.type;
-      cur=cur[p];
+    const segs = it.path.split("/");
+    let cur = root;
+    for(let i=0;i<segs.length;i++){
+      const s = segs[i];
+      if(!cur[s]) cur[s] = {};
+      if(i===segs.length-1) cur[s]._type = it.type;
+      cur = cur[s];
     }
   }
   return root;
 }
 
-/* ✅ 트리 렌더 */
 function renderTree(node, base=""){
-  const ul=document.createElement("ul");
-  ul.className=base?"indent":"";
+  const ul = document.createElement("ul");
+  ul.className = base ? "indent" : "";
 
-  const names=Object.keys(node)
-    .filter(k=>!k.startsWith("_"))
+  const names = Object.keys(node)
+    .filter(k => !k.startsWith("_"))
     .sort((a,b)=>{
-      const ad=node[a]._type==="tree"?0:1;
-      const bd=node[b]._type==="tree"?0:1;
-      return ad-bd||a.localeCompare(b);
+      const ad = (node[a]._type==="tree") ? 0 : 1;
+      const bd = (node[b]._type==="tree") ? 0 : 1;
+      return ad - bd || a.localeCompare(b);
     });
 
   for(const name of names){
-    const child=node[name];
-    const li=document.createElement("li");
+    const child = node[name];
+    const li = document.createElement("li");
 
-    const row=document.createElement("div");
-    const isDir=child._type==="tree";
-    row.className="node "+(isDir?"dir":"file");
+    const row = document.createElement("div");
+    const isDir = (child._type==="tree");
 
-    const caret=document.createElement("span");
-    caret.className="caret";
-    caret.textContent=isDir?"▸":"";
+    row.className = "node " + (isDir ? "dir" : "file");
 
-    const label=document.createElement("span");
-    label.className="name";
-    label.textContent=name;
+    const caret = document.createElement("span");
+    caret.textContent = isDir ? "▸" : "•";
+    caret.style.minWidth = "14px";
+
+    const label = document.createElement("span");
+    label.className = "name";
+    label.textContent = name;
 
     row.appendChild(caret);
     row.appendChild(label);
     li.appendChild(row);
 
     if(isDir){
-      const sub=renderTree(child, base+name+"/");
-      sub.style.display="none";
+      const sub = renderTree(child, base + name + "/");
+      sub.style.display = "none";
       row.addEventListener("click",()=>{
-        const show=sub.style.display==="none";
-        sub.style.display=show?"block":"none";
-        caret.textContent=show?"▾":"▸";
+        sub.style.display = sub.style.display==="none" ? "block" : "none";
+        caret.textContent = sub.style.display==="none" ? "▸" : "▾";
       });
       li.appendChild(sub);
     } else {
-      row.addEventListener("click",()=>openCode(base+name));
+      row.addEventListener("click",()=>openCode(base + name));
     }
 
     ul.appendChild(li);
   }
+
   return ul;
 }
 
-/* ✅ 코드 표시 */
 async function openCode(path){
-  codePath.textContent=path;
+  codePath.textContent = path;
   try{
-    const txt=await fetchFile("chapters/"+path);
-    const lang=langFromExt(path);
-    codeBlock.className="hljs "+lang;
-    codeBlock.textContent=txt;
+    const txt = await fetchFile("chapters/" + path);
+    const lang = langFromExt(path);
+    codeBlock.className = "hljs " + lang;
+    codeBlock.textContent = txt;
     hljs.highlightElement(codeBlock);
-  }catch{
-    codeBlock.textContent="불러오기 실패";
+  }catch(e){
+    codeBlock.textContent = "불러오기 실패";
   }
 }
 
-/* ✅ Boot */
 async function bootstrap(){
-  treeEl.innerHTML="<li style='padding:6px;color:#999'>불러오는 중…</li>";
+  treeEl.innerHTML = "<li style='padding:6px;color:#999'>불러오는 중…</li>";
 
-  const all=await fetchTree();
+  const full = await fetchTree();
 
-  /* ✅ chapters/ 아래만 가져오기 */
-  const filtered=all.filter(x=>x.path.startsWith("chapters/"));
+  // ✅ chapters/ 아래만 노출
+  const filtered = full.filter(x => x.path.startsWith("chapters/"));
 
-  /* ✅ chapters/ 제거 */
-  const stripped=filtered.map(x=>({
-    path:x.path.replace(/^chapters\//,""),
-    type:x.type
+  // ✅ chapters/ 제거
+  const stripped = filtered.map(x => ({
+    path: x.path.replace(/^chapters\//, ""),
+    type: x.type
   }));
 
-  const root=buildTree(stripped);
+  const root = buildTree(stripped);
 
-  treeEl.innerHTML="";
+  treeEl.innerHTML = "";
   treeEl.appendChild(renderTree(root,""));
 }
 
 bootstrap();
 
-/* ✅ PDF 자동 로드 */
-pdfFrame.src=`/${repo}/pdfjs/web/viewer.html?file=/${repo}/${pdfPath}`;
+// ✅ 오른쪽 PDF 자동 표시
+pdfFrame.src = `/${repo}/pdfjs/web/viewer.html?file=/${repo}/${pdfPath}`;
 </script>
 
 </body>
