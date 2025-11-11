@@ -7,24 +7,37 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v4
 
+      # LaTeX 컴파일
       - uses: xu-cheng/latex-action@v2
         with:
           root_file: main/main.tex
+          working_directory: .
+          latexmk_use_lualatex: true
+          args: >
+            -file-line-error
+            -halt-on-error
+            -interaction=nonstopmode
 
+      # pandoc 설치
       - name: Install pandoc
-        run: sudo apt-get update && sudo apt-get install -y pandoc
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y pandoc
 
+      # TEX → HTML 변환 + PDF 복사
       - name: Convert tex to html
         run: |
           mkdir site
           for f in $(find . -name "*.tex"); do
             pandoc "$f" -s -o "site/${f//\//_}.html"
           done
-          cp main.pdf site/
+          cp main/main.pdf site/
 
+      # GitHub Pages용 아티팩트 업로드
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
@@ -36,5 +49,6 @@ jobs:
     permissions:
       pages: write
       id-token: write
+
     steps:
       - uses: actions/deploy-pages@v4
