@@ -1,2 +1,35 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 텍스트 스타일 - 볼드, 이탤릭
+% 한글 폰트에 볼드체가 없는 경우가 있음. 기본적으로 bold체로 바꾸고, 한글은 FakeBold, 강도를 숫자로 조정
 \newcommand{\bd}[1]{\ifmmode{\let\txt\text \def\text##1{\txt{\addhangulfontfeatures{AutoFakeBold=3}\textbf{##1}}}\bm{#1}}%
 \else{\addhangulfontfeatures{AutoFakeBold=3}\textbf{\boldmath #1}}\fi}
+
+% 한글 폰트에 이탤릭체가 대부분 없음. 기본적으로 이탤릭체로 바꾸고, 한글은 FakeSlant, 강도를 숫자로 조정
+\newcommand{\itl}[1]{{\addhangulfontfeatures{AutoFakeSlant=.3}\textit{#1}}}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%% 색상, 형광펜
+%% 색상 정의 % xcolor, transparent 필요
+\definecolor{myred}{RGB}{255,70,70}
+\definecolor{myyellow}{RGB}{255,230,40}
+\definecolor{mylime}{RGB}{160,240,120}
+\definecolor{myblue}{RGB}{70,90,230}
+\definecolor{mywhite}{RGB}{255,255,255}
+
+%% 색상 텍스트
+\newcommand{\red}[1]{\textcolor{myred}{#1}}
+\newcommand{\yellow}[1]{\textcolor{myyellow}{#1}}
+\newcommand{\lime}[1]{\textcolor{mylime}{#1}}
+\newcommand{\blue}[1]{\textcolor{myblue}{#1}}
+\newcommand{\white}[1]{\textcolor{mywhite}{#1}}
+
+%% 형광펜, 강조 스타일 정의
+\newcommand{\hlr}[1]{\highLight[myred]{#1}}
+\newcommand{\hly}[1]{\highLight[myyellow]{#1}}
+\newcommand{\hll}[1]{\highLight[mylime]{#1}}
+\newcommand{\hlb}[1]{\highLight[myblue]{#1}}
+\newcommand{\hlw}[1]{\highLight[mywhite]{#1}}
+
+%% seolmode가 4일 때는 \hll(라임), 나머지는 \hlw - 똑같이 여백 차지
+\newcount\seolmode
+\newcommand{\seoli}[1]{%
+  \ifnum\seolmode=4 \hll{#1}%
+  \else \hlw{#1}\fi}
