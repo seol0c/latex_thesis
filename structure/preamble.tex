@@ -86,3 +86,13 @@
   \ifcase\value{ganadacnt}
     가.\ \or 나.\ \or 다.\ \or 라.\ \or 마.\ \or 바.\ \or 사.\ \or 아.\ \or 자.\ \or 차.\ \or 카.\ \or 타.\ \or 파.\ \or 하.\ %
   \fi\stepcounter{ganadacnt}}
+
+% an (숫자점)
+\newcounter{anumcounter} % an
+\NewDocumentCommand{\anset}{g}{\IfNoValueTF{#1}{\setcounter{anumcounter}{0}}{\setcounter{anumcounter}{#1}}}
+\newcommand{\an}[1][1em]{\par\stepcounter{anumcounter}\makebox[#1][r]{\theanumcounter.\,}\hangindent=#1 \hangafter=1\relax}
+
+% bn (괄호숫자)
+\newcounter{bnumcounter} % bn
+\NewDocumentCommand{\bnset}{g}{\IfNoValueTF{#1}{\setcounter{bnumcounter}{0}}{\setcounter{bnumcounter}{#1}}}
+\newcommand{\bn}[1][1.4em]{\par\refstepcounter{bnumcounter}\makebox[#1][r]{(\arabic{bnumcounter})\,}\hangindent=#1 \hangafter=1\relax}
