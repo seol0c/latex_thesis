@@ -33,3 +33,30 @@
 \newcommand{\seoli}[1]{%
   \ifnum\seolmode=4 \hll{#1}%
   \else \hlw{#1}\fi}
+
+% 박스 공통 스타일
+\tcbset{boxbase/.style={
+  boxrule=1pt, arc=1mm,%
+  top=4pt, bottom=4pt, left=4pt, right=4pt,%
+  colback=white,%
+  before upper={%
+  \setlength{\lineskiplimit}{2pt}%
+  \setlength{\lineskip}{5pt}%
+  \setlength{\abovedisplayskip}{5pt}%
+  \setlength{\belowdisplayskip}{5pt}%
+  \setlength{\abovedisplayshortskip}{5pt}%
+  \setlength{\belowdisplayshortskip}{5pt}}}}%
+
+% 박스 제목 있는 경우 위아래 여백 미리 확보
+\newcommand{\boxtitle}[1]{\raisebox{0pt}[9pt][2pt]{#1}}
+
+% 제목 없는 박스
+\newtcolorbox{graybox}{boxbase,%
+  colframe=gray}
+
+% 제목 입력 박스
+\NewTColorBox{sssbox}{g}{boxbase,%
+  title={\boxtitle{\IfNoValueTF{#1}{}{#1}}},
+  colframe=gray,%
+  colbacktitle=white,%
+  coltitle=black}
