@@ -96,3 +96,6 @@
 \newcounter{bnumcounter} % bn
 \NewDocumentCommand{\bnset}{g}{\IfNoValueTF{#1}{\setcounter{bnumcounter}{0}}{\setcounter{bnumcounter}{#1}}}
 \newcommand{\bn}[1][1.4em]{\par\refstepcounter{bnumcounter}\makebox[#1][r]{(\arabic{bnumcounter})\,}\hangindent=#1 \hangafter=1\relax}
+
+% bul
+\newcommand{\bul}[1][1em]{\par\makebox[#1][r]{\raisebox{0.25ex}{\scalebox{0.5}{$\bullet$}}\,\,}\hangindent=#1 \hangafter=1\relax}

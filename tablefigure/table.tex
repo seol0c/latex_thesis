@@ -1,4 +1,50 @@
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% 표. 설문 문항 요약 표
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\newcommand{\SurveyItems}{
+
+\newcommand{\ItemTitlei}{측정 시 적절한 소수점 아래 자릿수 결정하기}
+\newcommand{\ItemTitleii}{자를 이용한 연필 길이 측정}
+\newcommand{\ItemTitleiii}{버니어 캘리퍼스를 이용한 연필 길이 측정과 평균}
+\newcommand{\ItemTitleiv}{여러 측정값 평균}
+\newcommand{\ItemTitlev}{물리 상수}
+\newcommand{\ItemTitlevi}{유효숫자의 필요성}
+
+\begin{table}[h!]
+\centering
+\caption{설문 문항 구성 요약}
+\label{tab:설문_문항_요약}
+\vspace*{-6pt}
+{\fontsize{9pt}{10pt}\selectfont
+\begin{tabular}{
+>{\centering\arraybackslash}m{0.64cm} |
+>{\centering\arraybackslash}m{2.6cm} |
+>{\centering\arraybackslash}m{3cm} |
+>{\centering\arraybackslash}m{6.4cm}}\hline
+\rowcolor{gray!20}
+번호 & 영역 & 문항 제목 & 주요 질문 내용 \\\hline
+
+1 & \shortstack[1]{\rule{0pt}{1.4em} 측정 \\[4pt] (조건 제시형)} & \ItemTitlei
+& 눈금 간격 0.1\,cm 도구 사용 시 적절한 소수점 이하 자릿수 판단 및 이유 서술 \\\hline
+
+2 & \shortstack[1]{\rule{0pt}{1.4em} 측정 \\[4pt] (모의 측정)} & \ItemTitleii
+& 연필 좌측, 우측 눈금 판독과 길이 계산, 소수점 자릿수 판단 및 이유 서술 \\\hline
+
+3 & \shortstack[1]{\rule{0pt}{1.4em} 측정과 평균 계산 \\[4pt] (버니어캘리퍼스)} & \ItemTitleiii
+& 두 학생의 버니어캘리퍼스 측정값 평균 계산, 적절한 자릿수 판단 및 근거 제시 \\\hline
+
+4 & \shortstack[1]{\rule{0pt}{1.4em} 평균 계산 \\[4pt] (여러 측정값)} & \ItemTitleiv
+& 평균값 자릿수 선택 및 설명 \\\hline
+
+5 & 물리 상수 & \ItemTitlev
+& 물리 상수 사용 시 적절한 자릿수 판단, 정밀도와 신뢰도 관점에서 자릿수 과다 및 과소 사용의 영향 판단 \\\hline
+
+6 & 필요성 인식 & \ItemTitlevi
+& (1) 자 (2) 버니어 (3) 물리 상수 계산 상황에서
+유효숫자 필요성 판단 및 이유 서술 \\\hline
+\end{tabular}}\end{table}}
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% 표. 설문 분석 순서
@@ -25,7 +71,7 @@
  & 적용
  & 실제로 측정값을 읽을 때 측정 도구의 1/10까지 고려하는가?
  & 연필의 좌측과 우측 끝 눈금을 읽고 길이를 계산하기\\ \hline
-\multirow{2}{*}{\raisebox{-2\height}{2}}
+\multirow{2}{*}{\raisebox{-3.8\height}{2}}
  & 지식, 이해
  & 자료 해석에서 유효숫자 규칙을 바르게 알고, 적용해야 함을 아는가?
  & 측정값이 주어질 때, 평균값은 소수점 아래 몇 자리까지 기록하는 것이 적절한지 판단하기\\
@@ -202,23 +248,20 @@
 %% 표. 9개의 측정 결과
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 \newcommand{\SeveralMeasurementValues}{%
-\vspace*{8pt}
-\begin{table}[h!]
-\centering
-\vspace*{-8pt}
+\vspace*{6pt}\par\centering
 \begin{tabular}{
 >{\centering\arraybackslash}m{1.8cm} |
->{\centering\arraybackslash}m{0.8cm} |
->{\centering\arraybackslash}m{0.8cm} |
->{\centering\arraybackslash}m{0.8cm} |
->{\centering\arraybackslash}m{0.8cm} |
->{\centering\arraybackslash}m{0.8cm} |
->{\centering\arraybackslash}m{0.8cm} |
->{\centering\arraybackslash}m{0.8cm} |
->{\centering\arraybackslash}m{0.8cm} |
->{\centering\arraybackslash}m{0.8cm} } \hline
+>{\centering\arraybackslash}m{0.6cm} |
+>{\centering\arraybackslash}m{0.7cm} |
+>{\centering\arraybackslash}m{0.86cm} |
+>{\centering\arraybackslash}m{0.7cm} |
+>{\centering\arraybackslash}m{0.6cm} |
+>{\centering\arraybackslash}m{0.7cm} |
+>{\centering\arraybackslash}m{0.6cm} |
+>{\centering\arraybackslash}m{0.7cm} |
+>{\centering\arraybackslash}m{0.7cm} }\hline
 사용도구 & A & B & C & D & E & F & G & H & I \\\hline
 결과(cm) & 8.7 & 8.75 & 8.530 & 8.65 & 8.6 & 8.65 & 8.6 & 8.61 & 8.70 \\\hline
 \end{tabular}
-\vspace*{0pt}\end{table}}
+\vspace*{4pt}}
 
