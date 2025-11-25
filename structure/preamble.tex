@@ -70,6 +70,7 @@
 \hbadness=10000 % underfull hbox 경고 무시(수평 방향 여백 경고 badness 10000까지 무시)
 \vbadness=10000 % overfull hbox 경고 무시(수직 방향 페이니 나눔 단락 경고 badness 10000까지 무시)
 \WarningFilter{latex}{Command \showhyphens}
+\makeatletter\def\Hy@Warning#1{}\makeatother % 하이퍼링크 경고 삭제
 
 % bold 없는 폰트에서 bold 요청할 때 경고 제거
 \makeatletter
